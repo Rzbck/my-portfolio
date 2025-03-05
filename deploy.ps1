@@ -22,8 +22,8 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
-Write-Host "Poussée vers GitHub sur la branche main..."
-git push origin main
+Write-Host "Poussée vers GitHub sur la branche courante..."
+git push origin HEAD
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Erreur lors du push vers GitHub." -ForegroundColor Red
     exit 1
