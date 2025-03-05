@@ -3,7 +3,7 @@ Param(
     [string]$commitMessage = ""
 )
 
-# 1. Vérification du remote "origin"
+# 1. Vérification et ajout du remote "origin" si nécessaire
 $remoteUrl = git remote get-url origin 2>$null
 if ([string]::IsNullOrEmpty($remoteUrl)) {
     $response = Read-Host "Remote 'origin' introuvable. Voulez-vous l'ajouter avec l'URL 'https://github.com/Rzbck/my-portfolio.git'? (Y/N)"
@@ -56,9 +56,22 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
-# 5. Déploiement sur Netlify en production
+# 5. Exécution de la commande de build pour générer le dossier .next
+Write-Host "Exécution de la commande de build..."
+npm run build
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Erreur lors du build du projet." -ForegroundColor Red
+    exit 1
+}
+
+if (!(Test-Path ".next")) {
+    Write-Host "Le dossier .next n'a pas été trouvé après le build." -ForegroundColor Red
+    exit 1
+}
+
+# 6. Déploiement sur Netlify en production
 Write-Host "Déploiement sur Netlify en production..."
-netlify deploy --prod
+netlify deploy --prod --dir=".next"
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Erreur lors du déploiement sur Netlify." -ForegroundColor Red
     exit 1
