@@ -3,6 +3,17 @@ Param(
     [string]$commitMessage = ""
 )
 
+# 0. Vérifier si le dossier node_modules existe, sinon installer les dépendances npm
+if (!(Test-Path "node_modules")) {
+    Write-Host "Dossier 'node_modules' non trouvé. Installation des dépendances via npm install..."
+    npm install
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Erreur lors de l'installation des dépendances npm." -ForegroundColor Red
+        exit 1
+    }
+    Write-Host "Dépendances npm installées avec succès."
+}
+
 # 1. Vérification et ajout du remote "origin" si nécessaire
 $remoteUrl = git remote get-url origin 2>$null
 if ([string]::IsNullOrEmpty($remoteUrl)) {
@@ -24,9 +35,18 @@ if ([string]::IsNullOrEmpty($remoteUrl)) {
 # 2. Vérification de l'installation du Netlify CLI
 try {
     $netlifyVersion = netlify --version 2>&1
+    if ($netlifyVersion -match "not found") {
+        throw "Netlify CLI non trouvé."
+    }
 } catch {
-    Write-Host "Netlify CLI n'est pas installé. Veuillez l'installer avec : npm install -g netlify-cli" -ForegroundColor Red
-    exit 1
+    Write-Host "Netlify CLI n'est pas installé. Installation via npm install -g netlify-cli..."
+    npm install -g netlify-cli
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Erreur lors de l'installation du Netlify CLI." -ForegroundColor Red
+        exit 1
+    } else {
+        Write-Host "Netlify CLI installé avec succès."
+    }
 }
 
 # 3. Demander un message de commit si non fourni
