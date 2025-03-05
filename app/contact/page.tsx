@@ -1,6 +1,7 @@
 // app/contact/page.tsx
 import Link from 'next/link';
 import ContactForm from '../../components/ContactForm';
+
 import styles from '../page.module.css';
 
 export default function ContactPage() {
