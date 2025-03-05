@@ -56,7 +56,7 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
-# 5. Exécution de la commande de build pour générer le dossier .next
+# 5. Exécution de la commande de build (Vite)
 Write-Host "Exécution de la commande de build..."
 npm run build
 if ($LASTEXITCODE -ne 0) {
@@ -64,14 +64,15 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
-if (!(Test-Path ".next")) {
-    Write-Host "Le dossier .next n'a pas été trouvé après le build." -ForegroundColor Red
+# 6. Vérification de l'existence du dossier "dist"
+if (!(Test-Path "dist")) {
+    Write-Host "Le dossier 'dist' n'a pas été trouvé après le build." -ForegroundColor Red
     exit 1
 }
 
-# 6. Déploiement sur Netlify en production
+# 7. Déploiement sur Netlify en production (en utilisant le dossier 'dist')
 Write-Host "Déploiement sur Netlify en production..."
-netlify deploy --prod --dir=".next"
+netlify deploy --prod --dir="dist"
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Erreur lors du déploiement sur Netlify." -ForegroundColor Red
     exit 1
